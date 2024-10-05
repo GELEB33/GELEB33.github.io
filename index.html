@@ -1,158 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIG Clicker</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: url('https://i.pinimg.com/originals/8f/43/2f/8f432f9068f5b78d5bf7868c4c5a9b51.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            color: white;
-        }
-
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        #balance {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
-            border-radius: 10px;
-        }
-
-        #click-area {
-            font-size: 6rem;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        button {
-            font-size: 1.5rem;
-            padding: 10px 20px;
-            margin-top: 20px;
-            cursor: pointer;
-            background-color: #ff4081;
-            border: none;
-            border-radius: 5px;
-            color: white;
-        }
-
-        button:hover {
-            background-color: #e73370;
-        }
-
-        #store-container {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 10;
-        }
-
-        #store-container button {
-            background-color: #4caf50;
-            font-size: 1.2rem;
-        }
-
-        #store-container button:hover {
-            background-color: #45a049;
-        }
-
-        #close-store {
-            background-color: #ff4081;
-            margin-top: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIG Clicker</title>
+  <style>
+    body {
+      background-image: url('https://i.pinimg.com/originals/8f/43/2f/8f432f9068f5b78d5bf7868c4c5a9b51.jpg');
+      background-size: cover;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+    }
+    #pig-emoji {
+      font-size: 100px;
+      cursor: pointer;
+    }
+    #balance {
+      font-size: 24px;
+      margin: 20px;
+    }
+    button {
+      font-size: 18px;
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: #ff69b4;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #ff1493;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      color: #000;
+      text-align: center;
+      width: 300px;
+    }
+    .leaderboard-entry {
+      margin: 5px 0;
+    }
+    .close-button {
+      margin-top: 10px;
+      background-color: #ff69b4;
+    }
+  </style>
 </head>
 <body>
+  <h1>PIG Clicker</h1>
+  <div id="balance">Баланс: 0 PIG</div>
+  <div id="pig-emoji">🐷</div>
+  <div id="click-power">Сила клика: 1 PIG</div>
 
-    <div id="game-container">
-        <div id="balance">Balance: 0</div>
-        <div id="click-area">🐷</div>
-        <button id="store-btn">Go to Store</button>
-    </div>
+  <button id="leaderboard-button">Таблица лидеров</button>
+  <button id="upgrades-button">Улучшения</button>
+  <button id="change-name-button">Сменить имя</button>
 
-    <div id="store-container">
-        <h1>Store</h1>
-        <p id="upgrade-price">Upgrade Click Value: 100 PIG</p>
-        <button id="upgrade-btn">Increase Click +1</button>
-        <button id="close-store">Close Store</button>
-    </div>
+  <div id="leaderboard-modal" class="modal">
+    <h1>Таблица лидеров</h1>
+    <div id="leaderboard-entries"></div>
+    <button class="close-button" onclick="closeModal('leaderboard-modal')">Закрыть</button>
+  </div>
 
-    <script>
-        let balance = parseInt(localStorage.getItem('balance')) || 0;
-        let clickValue = parseInt(localStorage.getItem('clickValue')) || 1;
-        let upgradePrice = parseInt(localStorage.getItem('upgradePrice')) || 100;
+  <div id="upgrades-modal" class="modal">
+    <h1>Улучшения</h1>
+    <button class="upgrade-button" id="click-upgrade-button">Прокачка клика (100 PIG за +1)</button>
+    <button class="upgrade-button" id="random-pig-button">Рандомные PIG (20000 PIG)</button>
+    <button class="close-button" onclick="closeModal('upgrades-modal')">Закрыть</button>
+  </div>
 
-        // Обновление отображения баланса
-        function updateBalance() {
-            document.getElementById("balance").innerText = "Balance: " + balance;
-        }
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-        // Обновление цены апгрейда
-        function updateUpgradePrice() {
-            document.getElementById("upgrade-price").innerText = "Upgrade Click Value: " + upgradePrice + " PIG";
-        }
+    const firebaseConfig = {
+      apiKey: "AIzaSyA3uXpKy8H45C6HqiyqXECyezRGGpyHu_4",
+      authDomain: "pig-cliker.firebaseapp.com",
+      projectId: "pig-cliker",
+      storageBucket: "pig-cliker.appspot.com",
+      messagingSenderId: "600897676748",
+      appId: "1:600897676748:web:516bde72c600f625c1a969",
+      measurementId: "G-6TDRG8FD6M"
+    };
 
-        // Сохранение прогресса в LocalStorage
-        function saveProgress() {
-            localStorage.setItem('balance', balance);
-            localStorage.setItem('clickValue', clickValue);
-            localStorage.setItem('upgradePrice', upgradePrice);
-        }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // Клик по свинке
-        document.getElementById("click-area").addEventListener("click", function() {
-            balance += clickValue;
-            updateBalance();
-            saveProgress();
-        });
+    let pigBalance = 0;
+    let pigPerClick = 1;
 
-        // Открытие магазина
-        document.getElementById("store-btn").addEventListener("click", function() {
-            document.getElementById("store-container").style.display = "flex";
-        });
+    const balanceDisplay = document.getElementById("balance");
+    const clickPowerDisplay = document.getElementById("click-power");
+    const pigEmoji = document.getElementById("pig-emoji");
 
-        // Закрытие магазина
-        document.getElementById("close-store").addEventListener("click", function() {
-            document.getElementById("store-container").style.display = "none";
-        });
+    // Обновляем баланс на экране
+    function updateBalance() {
+      balanceDisplay.textContent = `Баланс: ${pigBalance} PIG`;
+      clickPowerDisplay.textContent = `Сила клика: ${pigPerClick} PIG`;
+    }
 
-        // Покупка апгрейда
-        document.getElementById("upgrade-btn").addEventListener("click", function() {
-            if (balance >= upgradePrice) {
-                balance -= upgradePrice;
-                clickValue += 1;
-                upgradePrice *= 2;
-                updateBalance();
-                updateUpgradePrice();
-                saveProgress();
-            } else {
-                alert("Not enough PIG to upgrade!");
-            }
-        });
+    // Обрабатываем клик по свинье
+    pigEmoji.onclick = () => {
+      pigBalance += pigPerClick;
+      updateBalance();
+      savePlayerData();
+    };
 
-        // Инициализация значений при загрузке
+    // Сохранение данных игрока в Firestore
+    async function savePlayerData() {
+      const playerName = localStorage.getItem('playerName') || prompt("Введите ваше имя:");
+      if (!playerName) {
+        alert("Имя обязательно для ввода!");
+        return;
+      }
+      localStorage.setItem('playerName', playerName);
+      await setDoc(doc(db, "players", playerName), { name: playerName, score: pigBalance, clickPower: pigPerClick });
+    }
+
+    // Закрытие модального окна
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Открытие модального окна улучшений
+    function openUpgradesWindow() {
+      document.getElementById('upgrades-modal').style.display = 'block';
+    }
+
+    // Открытие модального окна таблицы лидеров
+    function openLeaderboard() {
+      const leaderboardModal = document.getElementById('leaderboard-modal');
+      leaderboardModal.style.display = 'block';
+      updateLeaderboard();
+    }
+
+    // Обновление таблицы лидеров
+    async function updateLeaderboard() {
+      const entriesContainer = document.getElementById("leaderboard-entries");
+      entriesContainer.innerHTML = ""; // Очистка таблицы
+      const querySnapshot = await getDocs(collection(db, "players"));
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        const playerEntry = document.createElement("div");
+        playerEntry.className = "leaderboard-entry";
+        playerEntry.textContent = `${data.name}: ${data.score} PIG (Сила клика: ${data.clickPower})`;
+        entriesContainer.appendChild(playerEntry);
+      });
+    }
+
+    // Обработка кнопки улучшений
+    document.getElementById("upgrades-button").onclick = openUpgradesWindow;
+
+    // Обработка кнопки таблицы лидеров
+    document.getElementById("leaderboard-button").onclick = openLeaderboard;
+
+    // Обработка кнопки смены имени
+    document.getElementById("change-name-button").onclick = async function() {
+      const newName = prompt("Введите новое имя:");
+      if (newName) {
+        localStorage.setItem('playerName', newName);
+        await savePlayerData();
+        updateLeaderboard(); // Обновляем таблицу лидеров
+      } else {
+        alert("Имя обязательно для ввода!");
+      }
+    };
+
+    // Функция для обработки улучшений
+    document.getElementById("click-upgrade-button").onclick = function () {
+      if (pigBalance >= 100) {
+        pigBalance -= 100;
+        pigPerClick += 1;
         updateBalance();
-        updateUpgradePrice();
-    </script>
+        savePlayerData();
+      } else {
+        alert("Недостаточно PIG для улучшения!");
+      }
+    };
 
+    document.getElementById("random-pig-button").onclick = function () {
+      if (pigBalance >= 20000) {
+        pigBalance -= 20000;
+        const randomAmount = Math.floor(Math.random() * 50000) + 1;
+        pigBalance += randomAmount;
+        updateBalance();
+        savePlayerData();
+      } else {
+        alert("Недостаточно PIG для покупки рандомных PIG!");
+      }
+    };
+
+    // Загрузка данных при старте игры
+    async function loadPlayerData() {
+      const playerName = localStorage.getItem('playerName');
+      if (playerName) {
+        const docRef = doc(db, "players", playerName);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          pigBalance = docSnap.data().score;
+          pigPerClick = docSnap.data().clickPower || 1;
+          updateBalance();
+        }
+      } else {
+        // Запрос имени, если игрока еще нет
+        const newPlayerName = prompt("Введите ваше имя:");
+        if (newPlayerName) {
+          localStorage.setItem('playerName', newPlayerName);
+          await savePlayerData();
+        } else {
+          alert("Имя обязательно для ввода!");
+        }
+      }
+    }
+
+    loadPlayerData();
+  </script>
 </body>
 </html>
