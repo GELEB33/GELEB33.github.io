@@ -20,6 +20,10 @@
       font-size: 24px;
       margin: 20px;
     }
+    #player-name {
+      font-size: 24px;
+      margin: 20px;
+    }
     button {
       font-size: 18px;
       margin: 10px;
@@ -29,7 +33,6 @@
       border-radius: 5px;
       cursor: pointer;
       color: white;
-      transition: background-color 0.3s;
     }
     button:hover {
       background-color: #ff1493;
@@ -41,49 +44,58 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      background-color: #fff;
-      border-radius: 10px;
+      background-color: white;
+      color: black;
       padding: 20px;
+      border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-      color: #000;
-      text-align: center;
-      width: 300px;
     }
-    .leaderboard-entry {
-      margin: 5px 0;
-    }
-    .close-button {
-      margin-top: 10px;
-      background-color: #ff69b4;
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
 <body>
   <h1>PIG Clicker</h1>
+  <div id="player-name">Имя: Не установлено</div>
   <div id="balance">Баланс: 0 PIG</div>
   <div id="pig-emoji">🐷</div>
-  <div id="click-power">Сила клика: 1 PIG</div>
+  <div id="pig-per-click">За клик: 1 PIG</div>
 
   <button id="leaderboard-button">Таблица лидеров</button>
   <button id="upgrades-button">Улучшения</button>
   <button id="change-name-button">Сменить имя</button>
 
-  <div id="leaderboard-modal" class="modal">
-    <h1>Таблица лидеров</h1>
-    <div id="leaderboard-entries"></div>
-    <button class="close-button" onclick="closeModal('leaderboard-modal')">Закрыть</button>
-  </div>
+  <div id="modal-overlay"></div>
 
   <div id="upgrades-modal" class="modal">
     <h1>Улучшения</h1>
-    <button class="upgrade-button" id="click-upgrade-button">Прокачка клика (100 PIG за +1)</button>
-    <button class="upgrade-button" id="random-pig-button">Рандомные PIG (20000 PIG)</button>
-    <button class="close-button" onclick="closeModal('upgrades-modal')">Закрыть</button>
+    <button id="click-upgrade">Прокачка клика (100 PIG за +1)</button>
+    <button id="random-pig">Рандомные PIG (20000 PIG)</button>
+    <button id="close-upgrades">Закрыть</button>
   </div>
 
+  <div id="leaderboard-modal" class="modal">
+    <h1>Таблица лидеров</h1>
+    <div id="leaderboard"></div>
+    <button id="close-leaderboard">Закрыть</button>
+  </div>
+
+  <div id="change-name-modal" class="modal">
+    <h1>Сменить имя</h1>
+    <input type="text" id="new-name" placeholder="Новое имя">
+    <button id="save-name">Сохранить имя</button>
+    <button id="close-change-name">Закрыть</button>
+  </div>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA3uXpKy8H45C6HqiyqXECyezRGGpyHu_4",
@@ -100,15 +112,26 @@
 
     let pigBalance = 0;
     let pigPerClick = 1;
+    let playerName = ""; // Переменная для имени игрока
 
     const balanceDisplay = document.getElementById("balance");
-    const clickPowerDisplay = document.getElementById("click-power");
     const pigEmoji = document.getElementById("pig-emoji");
+    const playerNameDisplay = document.getElementById("player-name"); // Элемент для отображения имени
+    const pigPerClickDisplay = document.getElementById("pig-per-click"); // Элемент для отображения PIG за клик
 
     // Обновляем баланс на экране
     function updateBalance() {
       balanceDisplay.textContent = `Баланс: ${pigBalance} PIG`;
-      clickPowerDisplay.textContent = `Сила клика: ${pigPerClick} PIG`;
+    }
+
+    // Обновляем имя игрока на экране
+    function updatePlayerNameDisplay() {
+      playerNameDisplay.textContent = `Имя: ${playerName || "Не установлено"}`;
+    }
+
+    // Обновляем количество PIG за клик
+    function updatePigPerClick() {
+      pigPerClickDisplay.textContent = `За клик: ${pigPerClick} PIG`;
     }
 
     // Обрабатываем клик по свинье
@@ -120,112 +143,139 @@
 
     // Сохранение данных игрока в Firestore
     async function savePlayerData() {
-      const playerName = localStorage.getItem('playerName') || prompt("Введите ваше имя:");
       if (!playerName) {
-        alert("Имя обязательно для ввода!");
-        return;
+        playerName = prompt("Введите ваше имя:") || "Игрок"; // Если имя не задано, запрашиваем его
+        localStorage.setItem('playerName', playerName);
       }
-      localStorage.setItem('playerName', playerName);
-      await setDoc(doc(db, "players", playerName), { name: playerName, score: pigBalance, clickPower: pigPerClick });
-    }
-
-    // Закрытие модального окна
-    function closeModal(modalId) {
-      document.getElementById(modalId).style.display = 'none';
+      await setDoc(doc(db, "players", playerName), { name: playerName, score: pigBalance });
+      updatePlayerNameDisplay(); // Обновляем отображение имени игрока
     }
 
     // Открытие модального окна улучшений
     function openUpgradesWindow() {
+      document.getElementById('modal-overlay').style.display = 'block';
       document.getElementById('upgrades-modal').style.display = 'block';
+    }
+
+    // Закрытие модального окна улучшений
+    function closeUpgradesWindow() {
+      document.getElementById('modal-overlay').style.display = 'none';
+      document.getElementById('upgrades-modal').style.display = 'none';
     }
 
     // Открытие модального окна таблицы лидеров
     function openLeaderboard() {
-      const leaderboardModal = document.getElementById('leaderboard-modal');
-      leaderboardModal.style.display = 'block';
-      updateLeaderboard();
+      document.getElementById('modal-overlay').style.display = 'block';
+      document.getElementById('leaderboard-modal').style.display = 'block';
+      loadLeaderboard();
     }
 
-    // Обновление таблицы лидеров
-    async function updateLeaderboard() {
-      const entriesContainer = document.getElementById("leaderboard-entries");
-      entriesContainer.innerHTML = ""; // Очистка таблицы
-      const querySnapshot = await getDocs(collection(db, "players"));
-      querySnapshot.forEach(doc => {
-        const data = doc.data();
+    // Закрытие модального окна таблицы лидеров
+    function closeLeaderboard() {
+      document.getElementById('modal-overlay').style.display = 'none';
+      document.getElementById('leaderboard-modal').style.display = 'none';
+    }
+
+    // Загрузка таблицы лидеров
+    async function loadLeaderboard() {
+      const leaderboardDiv = document.getElementById("leaderboard");
+      leaderboardDiv.innerHTML = ""; // Очистка таблицы
+      const playersSnapshot = await getDocs(collection(db, "players"));
+      playersSnapshot.forEach((doc) => {
         const playerEntry = document.createElement("div");
-        playerEntry.className = "leaderboard-entry";
-        playerEntry.textContent = `${data.name}: ${data.score} PIG (Сила клика: ${data.clickPower})`;
-        entriesContainer.appendChild(playerEntry);
+        playerEntry.textContent = `${doc.data().name}: ${doc.data().score} PIG`;
+        leaderboardDiv.appendChild(playerEntry);
       });
     }
 
-    // Обработка кнопки улучшений
-    document.getElementById("upgrades-button").onclick = openUpgradesWindow;
+    // Открытие модального окна для смены имени
+    function openChangeNameWindow() {
+      document.getElementById('modal-overlay').style.display = 'block';
+      document.getElementById('change-name-modal').style.display = 'block';
+    }
 
-    // Обработка кнопки таблицы лидеров
-    document.getElementById("leaderboard-button").onclick = openLeaderboard;
+    // Закрытие модального окна для смены имени
+    function closeChangeNameWindow() {
+      document.getElementById('modal-overlay').style.display = 'none';
+      document.getElementById('change-name-modal').style.display = 'none';
+    }
 
-    // Обработка кнопки смены имени
-    document.getElementById("change-name-button").onclick = async function() {
-      const newName = prompt("Введите новое имя:");
-      if (newName) {
-        localStorage.setItem('playerName', newName);
-        await savePlayerData();
-        updateLeaderboard(); // Обновляем таблицу лидеров
-      } else {
-        alert("Имя обязательно для ввода!");
-      }
-    };
+    // Обработка кнопок для сохранения нового имени
+    document.getElementById("save-name").onclick = async () => {
+    const newName = document.getElementById("new-name").value;
+    if (newName) {
+    // Удаляем старую запись в Firestore, если имя уже было задано
+    if (playerName) {
+      await setDoc(doc(db, "players", playerName), { name: playerName, score: pigBalance });
+    }
 
-    // Функция для обработки улучшений
-    document.getElementById("click-upgrade-button").onclick = function () {
+    playerName = newName;
+    localStorage.setItem('playerName', playerName);
+    
+    // Сохраняем новое имя в Firestore
+    await setDoc(doc(db, "players", playerName), { name: playerName, score: pigBalance });
+    updatePlayerNameDisplay(); // Обновляем отображение имени игрока
+    loadLeaderboard(); // Обновляем таблицу лидеров
+    alert("Имя изменено на: " + playerName);
+    
+    closeChangeNameWindow(); // Закрываем модальное окно после сохранения
+  } else {
+    alert("Введите новое имя!");
+  }
+};
+
+
+    // Прокачка клика
+    document.getElementById("click-upgrade").onclick = () => {
       if (pigBalance >= 100) {
         pigBalance -= 100;
         pigPerClick += 1;
         updateBalance();
-        savePlayerData();
+        updatePigPerClick(); // Обновляем отображение PIG за клик
+        alert("Ваш клик теперь приносит больше PIG!");
       } else {
-        alert("Недостаточно PIG для улучшения!");
+        alert("Недостаточно PIG для прокачки!");
       }
     };
 
-    document.getElementById("random-pig-button").onclick = function () {
+    // Получение рандомных PIG
+    document.getElementById("random-pig").onclick = () => {
       if (pigBalance >= 20000) {
         pigBalance -= 20000;
-        const randomAmount = Math.floor(Math.random() * 50000) + 1;
-        pigBalance += randomAmount;
+        const randomPIG = Math.floor(Math.random() * 50000) + 1;
+        pigBalance += randomPIG;
         updateBalance();
-        savePlayerData();
+        alert(`Вы получили ${randomPIG} PIG!`);
       } else {
-        alert("Недостаточно PIG для покупки рандомных PIG!");
+        alert("Недостаточно PIG для получения случайных PIG!");
       }
     };
 
     // Загрузка данных при старте игры
     async function loadPlayerData() {
-      const playerName = localStorage.getItem('playerName');
-      if (playerName) {
+      const storedName = localStorage.getItem('playerName');
+      if (storedName) {
+        playerName = storedName;
         const docRef = doc(db, "players", playerName);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           pigBalance = docSnap.data().score;
-          pigPerClick = docSnap.data().clickPower || 1;
           updateBalance();
-        }
-      } else {
-        // Запрос имени, если игрока еще нет
-        const newPlayerName = prompt("Введите ваше имя:");
-        if (newPlayerName) {
-          localStorage.setItem('playerName', newPlayerName);
-          await savePlayerData();
-        } else {
-          alert("Имя обязательно для ввода!");
+          updatePlayerNameDisplay(); // Обновляем отображение имени игрока
+          updatePigPerClick(); // Обновляем отображение PIG за клик
         }
       }
     }
 
     loadPlayerData();
+
+    // Обработчики событий для кнопок
+    document.getElementById("leaderboard-button").onclick = openLeaderboard;
+    document.getElementById("upgrades-button").onclick = openUpgradesWindow;
+    document.getElementById("change-name-button").onclick = openChangeNameWindow;
+    document.getElementById("close-upgrades").onclick = closeUpgradesWindow;
+    document.getElementById("close-leaderboard").onclick = closeLeaderboard;
+    document.getElementById("close-change-name").onclick = closeChangeNameWindow;
   </script>
 </body>
 </html>
