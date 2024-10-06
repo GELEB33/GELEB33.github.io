@@ -6,7 +6,7 @@
   <title>PIG Clicker</title>
   <style>
     body {
-      background-image: url('https://i.pinimg.com/originals/8f/43/2f/8f432f9068f5b78d5bf7868c4c5a9b51.jpg');
+      background-image: url('https://i.yapx.ru/YDB8i.jpg');
       background-size: cover;
       color: #fff;
       font-family: 'Arial', sans-serif;
@@ -16,13 +16,10 @@
       font-size: 100px;
       cursor: pointer;
     }
-    #balance {
+    #balance, #player-name, #pig-per-click, #goal, #remaining-to-goal {
       font-size: 24px;
       margin: 20px;
-    }
-    #player-name {
-      font-size: 24px;
-      margin: 20px;
+      text-shadow: 1px 1px 0px black; /* Черная обводка текста */
     }
     button {
       font-size: 18px;
@@ -65,56 +62,46 @@
   <h1>PIG Clicker</h1>
   <div id="player-name">Имя: Не установлено</div>
   <div id="balance">Баланс: 0 PIG</div>
+  <div id="goal">Цель: 1 миллиард PIG</div>
+  <div id="remaining-to-goal">Осталось до цели: 1000000000 PIG</div>
   <div id="pig-emoji">🐷</div>
   <div id="pig-per-click">За клик: 1 PIG</div>
-  <div id="target">Цель: 1,000,000,000 PIG</div>
-  <div id="pig-buy-price">Цена свиньи: 500,000 PIG</div>
 
+  <button id="name-button">Сменить имя</button>
   <button id="upgrades-button">Улучшения</button>
-  <button id="change-name-button">Сменить имя</button>
-  <button id="buy-pig-button">Купить свинью</button>
 
   <div id="modal-overlay"></div>
 
   <div id="upgrades-modal" class="modal">
     <h1>Улучшения</h1>
     <button id="click-upgrade">Прокачка клика (100 PIG за +1)</button>
-    <button id="random-pig">Рандомные PIG (20,000 PIG)</button>
+    <button id="random-pig">Рандомные PIG (20000 PIG)</button>
+    <button id="buy-pig">Купить свинью (500000 PIG)</button>
     <button id="close-upgrades">Закрыть</button>
   </div>
 
-  <div id="change-name-modal" class="modal">
-    <h1>Сменить имя</h1>
-    <input type="text" id="new-name" placeholder="Новое имя">
-    <button id="save-name">Сохранить имя</button>
-    <button id="close-change-name">Закрыть</button>
-  </div>
-
-  <script type="module">
+  <script>
     let pigBalance = 0;
     let pigPerClick = 1;
-    let playerName = ""; 
-    let pigPerSecond = 0; // Переменная для PIG в секунду
-    let pigCost = 500000; // Начальная цена свиньи
-    const targetAmount = 1000000000; // Цель в 1 миллиард PIG
+    let playerName = ""; // Переменная для имени игрока
+    let pigPerSecond = 0; // Количество PIG в секунду
+    let pigCost = 500000; // Стоимость свиньи
+    let goal = 1000000000; // Цель: 1 миллиард PIG
 
     const balanceDisplay = document.getElementById("balance");
     const pigEmoji = document.getElementById("pig-emoji");
-    const playerNameDisplay = document.getElementById("player-name"); 
-    const pigPerClickDisplay = document.getElementById("pig-per-click"); 
-    const targetDisplay = document.getElementById("target");
-    const pigBuyPriceDisplay = document.getElementById("pig-buy-price");
+    const playerNameDisplay = document.getElementById("player-name");
+    const pigPerClickDisplay = document.getElementById("pig-per-click");
+    const goalDisplay = document.getElementById("goal");
+    const remainingToGoalDisplay = document.getElementById("remaining-to-goal");
 
     // Обновляем баланс на экране
     function updateBalance() {
       balanceDisplay.textContent = `Баланс: ${pigBalance} PIG`;
-      checkGoal();
-    }
-
-    // Проверка достижения цели
-    function checkGoal() {
-      if (pigBalance >= targetAmount) {
-        alert("Поздравляем! Вы достигли цели в 1 миллиард PIG!");
+      remainingToGoalDisplay.textContent = `Осталось до цели: ${goal - pigBalance} PIG`;
+      if (pigBalance >= goal) {
+        alert("Спасибо, что прошли мою игру ПУПС!");
+        resetGame();
       }
     }
 
@@ -132,44 +119,33 @@
     pigEmoji.onclick = () => {
       pigBalance += pigPerClick;
       updateBalance();
+      savePlayerData();
     };
 
-    // Открытие модального окна улучшений
-    function openUpgradesWindow() {
-      document.getElementById('modal-overlay').style.display = 'block';
-      document.getElementById('upgrades-modal').style.display = 'block';
+    // Сохранение данных игрока в localStorage
+    function savePlayerData() {
+      localStorage.setItem('playerName', playerName);
+      localStorage.setItem('pigBalance', pigBalance);
+      localStorage.setItem('pigPerClick', pigPerClick);
+      localStorage.setItem('pigCost', pigCost);
+      localStorage.setItem('pigPerSecond', pigPerSecond);
     }
 
-    // Закрытие модального окна улучшений
-    function closeUpgradesWindow() {
-      document.getElementById('modal-overlay').style.display = 'none';
-      document.getElementById('upgrades-modal').style.display = 'none';
-    }
+    // Загрузка данных при старте игры
+    function loadPlayerData() {
+      const storedName = localStorage.getItem('playerName');
+      if (storedName) {
+        playerName = storedName;
+        pigBalance = parseInt(localStorage.getItem('pigBalance')) || 0;
+        pigPerClick = parseInt(localStorage.getItem('pigPerClick')) || 1;
+        pigCost = parseInt(localStorage.getItem('pigCost')) || 500000;
+        pigPerSecond = parseInt(localStorage.getItem('pigPerSecond')) || 0;
 
-    // Открытие модального окна для смены имени
-    function openChangeNameWindow() {
-      document.getElementById('modal-overlay').style.display = 'block';
-      document.getElementById('change-name-modal').style.display = 'block';
-    }
-
-    // Закрытие модального окна для смены имени
-    function closeChangeNameWindow() {
-      document.getElementById('modal-overlay').style.display = 'none';
-      document.getElementById('change-name-modal').style.display = 'none';
-    }
-
-    // Обработка кнопок для сохранения нового имени
-    document.getElementById("save-name").onclick = () => {
-      const newName = document.getElementById("new-name").value;
-      if (newName) {
-        playerName = newName;
-        updatePlayerNameDisplay(); 
-        alert("Имя изменено на: " + playerName);
-        closeChangeNameWindow(); 
-      } else {
-        alert("Введите новое имя!");
+        updateBalance();
+        updatePlayerNameDisplay();
+        updatePigPerClick();
       }
-    };
+    }
 
     // Прокачка клика
     document.getElementById("click-upgrade").onclick = () => {
@@ -177,7 +153,7 @@
         pigBalance -= 100;
         pigPerClick += 1;
         updateBalance();
-        updatePigPerClick();
+        updatePigPerClick(); 
         alert("Ваш клик теперь приносит больше PIG!");
       } else {
         alert("Недостаточно PIG для прокачки!");
@@ -197,31 +173,49 @@
       }
     };
 
-    // Функция покупки свиньи
-    document.getElementById("buy-pig-button").onclick = () => {
+    // Купить свинью
+    document.getElementById("buy-pig").onclick = () => {
       if (pigBalance >= pigCost) {
         pigBalance -= pigCost;
         pigPerSecond += 10; // Увеличиваем PIG в секунду
         pigCost += 1000000; // Увеличиваем стоимость свиньи на 1 миллион
         updateBalance();
-        pigBuyPriceDisplay.textContent = `Цена свиньи: ${pigCost} PIG`;
-        alert(`Вы купили свинью! Теперь вы получаете ${pigPerSecond} PIG в секунду.`);
+        alert(`Свинья куплена! Теперь вы получаете ${pigPerSecond} PIG в секунду.`);
       } else {
         alert("Недостаточно PIG для покупки свиньи!");
       }
     };
 
-    // Обновление баланса каждую секунду
+    // Цикл для генерации PIG в секунду
     setInterval(() => {
       pigBalance += pigPerSecond;
       updateBalance();
+      savePlayerData();
     }, 1000);
 
-    // Обработчики событий для кнопок
-    document.getElementById("upgrades-button").onclick = openUpgradesWindow;
-    document.getElementById("change-name-button").onclick = openChangeNameWindow;
-    document.getElementById("close-upgrades").onclick = closeUpgradesWindow;
-    document.getElementById("close-change-name").onclick = closeChangeNameWindow;
+    // Обработка открытия и закрытия модального окна
+    document.getElementById("upgrades-button").onclick = () => {
+      document.getElementById("upgrades-modal").style.display = "block";
+      document.getElementById("modal-overlay").style.display = "block";
+    };
+
+    document.getElementById("close-upgrades").onclick = () => {
+      document.getElementById("upgrades-modal").style.display = "none";
+      document.getElementById("modal-overlay").style.display = "none";
+    };
+
+    // Обработка смены имени
+    document.getElementById("name-button").onclick = () => {
+      const newName = prompt("Введите новое имя:");
+      if (newName) {
+        playerName = newName;
+        updatePlayerNameDisplay();
+        savePlayerData();
+      }
+    };
+
+    // Загружаем данные игрока при старте
+    loadPlayerData();
   </script>
 </body>
 </html>
