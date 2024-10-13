@@ -171,7 +171,6 @@
       <div id="nose-dot-right" class="nose-dot"></div>
     </div>
 
-    <button id="name-button">Сменить имя</button>
     <button id="upgrades-button">Улучшения</button>
     <button id="farm-button">Ферма</button>
     <button id="help-button">?</button>
@@ -232,7 +231,7 @@
 
     let pigBalance = localStorage.getItem('pigBalance') ? parseInt(localStorage.getItem('pigBalance')) : 0;
     let pigPerClick = localStorage.getItem('pigPerClick') ? parseInt(localStorage.getItem('pigPerClick')) : 1;
-    let playerName = localStorage.getItem('playerName') || "";
+    let playerName = "Игрок"; // Имя по умолчанию
     let pigCount = localStorage.getItem('pigCount') ? parseInt(localStorage.getItem('pigCount')) : 0;
     let timeUntilNextPig = localStorage.getItem('timeUntilNextPig') ? parseInt(localStorage.getItem('timeUntilNextPig')) : 3600;
     let pigsToSpawn = Math.floor(Math.random() * 5) + 1;
@@ -268,7 +267,7 @@
     }
 
     function updatePlayerNameDisplay() {
-      playerNameDisplay.textContent = `Имя: ${playerName || "Не установлено"}`;
+      playerNameDisplay.textContent = `Имя: ${playerName}`;
       localStorage.setItem('playerName', playerName);
     }
 
@@ -336,33 +335,26 @@
         pigBalance -= 20000; // Списываем 20,000
         updateBalance();
 
-        // Проверка на пандемию с шансом 0.5%
-        if (Math.random() < 0.005) {
-          alert("Пандемия! У вас списано 10 кликов и 2 свиньи.");
-          pigPerClick = Math.max(pigPerClick - 10, 0); // Снижаем клики за тап, не допускаем отрицательных значений
-          pigCount = Math.max(pigCount - 2, 0); // Снижаем количество свиней, не допускаем отрицательных значений
+        const randomNum = Math.random();
+        let earnedCoins = 0;
+
+        if (randomNum < 0.337) {
+          earnedCoins = 10000; // 33.7%
+        } else if (randomNum < 0.837) {
+          earnedCoins = 5000; // 50%
+        } else if (randomNum < 0.937) {
+          earnedCoins = 25000; // 10%
+        } else if (randomNum < 0.987) {
+          earnedCoins = 50000; // 5%
+        } else if (randomNum < 0.997) {
+          earnedCoins = 150000; // 1%
         } else {
-          const randomNum = Math.random();
-          let earnedCoins = 0;
-
-          if (randomNum < 0.337) {
-            earnedCoins = 10000; // 33.7%
-          } else if (randomNum < 0.837) {
-            earnedCoins = 5000; // 50%
-          } else if (randomNum < 0.937) {
-            earnedCoins = 25000; // 10%
-          } else if (randomNum < 0.987) {
-            earnedCoins = 50000; // 5%
-          } else if (randomNum < 0.997) {
-            earnedCoins = 150000; // 1%
-          } else {
-            earnedCoins = 1000000; // 0.3%
-          }
-
-          pigBalance += earnedCoins; // Добавляем рандомные pigcoin
-          updateBalance();
-          alert(`Вы получили ${earnedCoins} pigcoin!`);
+          earnedCoins = 1000000; // 0.3%
         }
+
+        pigBalance += earnedCoins; // Добавляем рандомные pigcoin
+        updateBalance();
+        alert(`Вы получили ${earnedCoins} pigcoin!`);
       } else {
         alert("Недостаточно pigcoin для получения рандомных pigcoin!");
       }
@@ -405,14 +397,6 @@
       }, 500);
     };
 
-    document.getElementById("name-button").onclick = () => {
-      const newName = prompt("Введите ваше имя:");
-      if (newName) {
-        playerName = newName;
-        updatePlayerNameDisplay();
-      }
-    };
-
     document.getElementById("upgrades-button").onclick = () => {
       upgradesModal.style.display = "block";
       upgradesModal.style.opacity = 1; 
@@ -445,7 +429,6 @@
     };
 
     window.onload = () => {
-      playerName = localStorage.getItem('playerName') || prompt("Введите ваше имя:") || "Не установлено";
       updatePlayerNameDisplay();
       updateFarmDisplay();
       updatePigPerClick();
