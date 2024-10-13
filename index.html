@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PIG Clicker</title>
+
+  <!-- Yandex.RTB -->
+  <script>window.yaContextCb=window.yaContextCb||[]</script>
+  <script src="https://yandex.ru/ads/system/context.js" async></script>
+
   <style>
     body {
       background-image: url('https://i.yapx.ru/YDB8i.jpg');
@@ -200,6 +205,17 @@
       <button id="close-help">Закрыть</button>
     </div>
   </div>
+
+  <!-- Yandex.RTB R-A-12347307-1 -->
+  <script>
+  window.yaContextCb.push(() => {
+      Ya.Context.AdvManager.render({
+          "blockId": "R-A-12347307-1",
+          "type": "floorAd",
+          "platform": "touch"
+      })
+  })
+  </script>
 
   <script>
     const pigFacts = [
@@ -458,4 +474,3 @@
   </script>
 </body>
 </html>
-
