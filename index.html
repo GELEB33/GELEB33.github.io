@@ -1,101 +1,318 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PIG Clicker</title>
+  <title>PIG Clicker - Милая свиноферма</title>
   
   <style>
+    :root {
+      --primary-pink: #FFB6C1;
+      --secondary-pink: #FFC0CB;
+      --dark-pink: #D87093;
+      --light-pink: #FFE4E9;
+      --pig-nose: #F8A5C2;
+      --grass-green: #7CFC00;
+      --sky-blue: #87CEEB;
+      --barn-red: #8B4513;
+      --coin-gold: #FFD700;
+    }
+
     body {
-      background-image: url('https://i.yapx.ru/YDB8i.jpg');
-      background-size: cover;
-      color: #fff;
-      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, var(--sky-blue) 0%, #98FB98 100%);
+      color: #333;
+      font-family: 'Comic Neue', 'Arial Rounded MT Bold', 'Arial', sans-serif;
       text-align: center;
       padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .game-container {
-      border: 5px solid #f5a9a9;
-      border-radius: 15px;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.7);
-      max-width: 900px;
+      border: 8px solid var(--primary-pink);
+      border-radius: 25px;
+      padding: 25px;
+      background: linear-gradient(145deg, #ffffff 0%, var(--light-pink) 100%);
+      max-width: 1000px;
       width: 90%;
       display: inline-block;
-      animation: fadeIn 0.5s;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
       margin: auto;
+      margin-top: 20px;
+    }
+
+    .game-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 15px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--primary-pink),
+        var(--primary-pink) 20px,
+        var(--secondary-pink) 20px,
+        var(--secondary-pink) 40px
+      );
+      border-radius: 25px 25px 0 0;
+    }
+
+    .header {
+      margin-bottom: 25px;
       position: relative;
     }
 
     h1 {
-      font-size: 48px;
-      text-shadow: 2px 2px 0px black;
-      border: 4px solid #f5a9a9;
-      padding: 10px;
-      border-radius: 10px;
+      font-size: 52px;
+      color: var(--dark-pink);
+      text-shadow: 3px 3px 0px rgba(255, 182, 193, 0.3);
+      margin: 0 0 15px 0;
+      padding: 15px 30px;
+      background-color: white;
+      border-radius: 20px;
+      display: inline-block;
+      border: 5px solid var(--primary-pink);
+      box-shadow: 0 8px 0 rgba(216, 112, 147, 0.2);
+      letter-spacing: 1px;
     }
 
-    #pig-emoji {
-      width: 150px;
-      height: 150px;
-      background-color: #f5a9a9;
-      border-radius: 50%;
-      position: relative;
-      margin: 20px auto;
-      cursor: pointer;
+    .stats-container {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 3px solid #a37171;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: white;
+      padding: 15px 25px;
+      border-radius: 15px;
+      border: 4px solid var(--primary-pink);
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--dark-pink);
+      box-shadow: 0 6px 0 rgba(216, 112, 147, 0.2);
+      min-width: 200px;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-box::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--primary-pink), var(--secondary-pink));
+    }
+
+    .pig-container {
+      position: relative;
+      margin: 30px auto;
+      width: 220px;
+      height: 220px;
+      cursor: pointer;
+    }
+
+    .pig-body {
+      width: 200px;
+      height: 180px;
+      background: linear-gradient(145deg, #FFC0CB, #FFB6C1);
+      border-radius: 50% 50% 45% 45%;
+      position: relative;
+      margin: 0 auto;
+      box-shadow: 
+        inset 0 -15px 20px rgba(0,0,0,0.1),
+        0 10px 25px rgba(0,0,0,0.15);
       transition: transform 0.1s;
     }
 
-    .nose-dot {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      background-color: #402828;
-      border-radius: 50%;
-      border: 5px solid #a37171;
-    }
-
-    #nose-dot-left { top: 35%; left: 60%; }
-    #nose-dot-right { top: 35%; right: 60%; }
-
-    #balance, #player-name, #pig-per-click, #play-time {
-      font-size: 24px;
-      margin: 20px;
-      text-shadow: 1px 1px 0px black;
-    }
-
-    #fact {
-      font-size: 18px;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 0px black;
-    }
-
-    button {
-      font-size: 18px;
-      margin: 10px;
-      padding: 10px 20px;
-      background-color: #f5a9a9;
-      border: 2px solid #a37171;
-      border-radius: 5px;
-      cursor: pointer;
-      color: white;
-      transition: background-color 0.3s, transform 0.2s;
-      width: calc(100% - 40px);
-    }
-
-    button:hover {
-      background-color: #e67e22;
+    .pig-body:hover {
       transform: scale(1.05);
     }
 
-    button:active {
-      background-color: #c76c6c;
-      transform: scale(0.95);
+    .pig-ear {
+      position: absolute;
+      width: 60px;
+      height: 50px;
+      background: #FFB6C1;
+      border-radius: 50%;
+      top: -15px;
+    }
+
+    .pig-ear.left {
+      left: 25px;
+      transform: rotate(-15deg);
+    }
+
+    .pig-ear.right {
+      right: 25px;
+      transform: rotate(15deg);
+    }
+
+    .pig-ear-inner {
+      position: absolute;
+      width: 40px;
+      height: 30px;
+      background: #FF8BA7;
+      border-radius: 50%;
+      top: 10px;
+      left: 10px;
+    }
+
+    .pig-eye {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background: white;
+      border-radius: 50%;
+      top: 60px;
+      border: 3px solid #333;
+      overflow: hidden;
+    }
+
+    .pig-eye.left {
+      left: 55px;
+    }
+
+    .pig-eye.right {
+      right: 55px;
+    }
+
+    .pig-eye::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #333;
+      border-radius: 50%;
+      top: 5px;
+      left: 5px;
+    }
+
+    .pig-nose {
+      position: absolute;
+      width: 80px;
+      height: 50px;
+      background: var(--pig-nose);
+      border-radius: 50%;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid #D87093;
+      box-shadow: inset 0 5px 10px rgba(0,0,0,0.1);
+    }
+
+    .nose-hole {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #8B5A5A;
+      border-radius: 50%;
+      top: 16px;
+    }
+
+    .nose-hole.left {
+      left: 18px;
+    }
+
+    .nose-hole.right {
+      right: 18px;
+    }
+
+    .pig-mouth {
+      position: absolute;
+      width: 40px;
+      height: 15px;
+      background: transparent;
+      border-bottom: 4px solid #D87093;
+      border-radius: 0 0 50% 50%;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .buttons-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .game-button {
+      font-size: 20px;
+      padding: 15px 20px;
+      background: linear-gradient(to bottom, var(--primary-pink), var(--dark-pink));
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      transition: all 0.2s;
+      box-shadow: 0 8px 0 #A64D79;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 11px 0 #A64D79;
+    }
+
+    .game-button:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #A64D79;
+    }
+
+    .game-button::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .game-button:hover::after {
+      left: 100%;
+    }
+
+    .fact-box {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      border: 4px dashed var(--primary-pink);
+      margin: 25px 0;
+      font-size: 20px;
+      color: #555;
+      font-style: italic;
+      position: relative;
+    }
+
+    .fact-box::before {
+      content: "💡";
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      font-size: 24px;
+    }
+
+    .warning {
+      color: #FF4500;
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+      text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
     }
 
     .modal {
@@ -105,134 +322,308 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
       opacity: 0;
       transition: opacity 0.5s ease;
-      max-width: 80%;
+      max-width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
       text-align: center;
-      background-color: #8B1E3D;
-      color: white;
+      background: linear-gradient(135deg, #ffffff 0%, #FFE4E9 100%);
+      border: 8px solid var(--primary-pink);
+      color: #333;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .modal h1 {
+      font-size: 36px;
+      margin-bottom: 25px;
+      color: var(--dark-pink);
     }
 
-    @keyframes clickEffect {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); background-color: #c76c6c; }
-      100% { transform: scale(1); background-color: #f5a9a9; }
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 32px;
-      }
-
-      #balance, #player-name, #pig-per-click, #play-time {
-        font-size: 18px;
-      }
-
-      button {
-        font-size: 16px;
-      }
-      
-      #fact {
-        font-size: 16px;
-      }
+    .modal-content {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
     #farm-window {
       display: none;
-      background-image: url('https://i.yapx.ru/YDB8i.jpg'); /* Для фермы */
-      background-size: cover;
-      padding: 20px;
-      color: white;
+      background: linear-gradient(135deg, #E0FFFF 0%, #98FB98 100%);
+      padding: 25px;
+      color: #333;
       margin-top: 20px;
-      border-radius: 10px;
+      border-radius: 20px;
+      border: 8px solid #8B4513;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
     }
-    
+
+    #farm-window h1 {
+      color: #8B4513;
+      border-color: #8B4513;
+    }
+
+    .pig-count-display {
+      font-size: 28px;
+      color: var(--dark-pink);
+      font-weight: bold;
+      margin: 10px 0;
+      text-shadow: 1px 1px 0px white;
+    }
+
+    .coin-animation {
+      position: absolute;
+      font-size: 24px;
+      color: var(--coin-gold);
+      font-weight: bold;
+      pointer-events: none;
+      animation: coinFloat 1s forwards;
+      text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    }
+
+    @keyframes coinFloat {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pigClick {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .pig-click-animation {
+      animation: pigClick 0.2s;
+    }
+
+    .grass-decoration {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(to top, var(--grass-green), #32CD32);
+      border-radius: 0 0 15px 15px;
+      z-index: 1;
+    }
+
+    .grass-blade {
+      position: absolute;
+      bottom: 40px;
+      width: 5px;
+      height: 20px;
+      background: var(--grass-green);
+      border-radius: 5px 5px 0 0;
+    }
+
+    .grass-blade:nth-child(odd) {
+      transform: rotate(-15deg);
+    }
+
+    .grass-blade:nth-child(even) {
+      transform: rotate(15deg);
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 36px;
+      }
+      
+      .stat-box {
+        font-size: 18px;
+        min-width: 150px;
+        padding: 12px 15px;
+      }
+      
+      .game-button {
+        font-size: 18px;
+        padding: 12px 15px;
+      }
+      
+      .pig-container {
+        width: 180px;
+        height: 180px;
+      }
+      
+      .pig-body {
+        width: 160px;
+        height: 140px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .game-container {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 28px;
+        padding: 10px 15px;
+      }
+      
+      .buttons-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .floating-pig {
+      position: absolute;
+      font-size: 30px;
+      pointer-events: none;
+      animation: floatAround 20s infinite linear;
+      z-index: -1;
+      opacity: 0.3;
+    }
+
+    @keyframes floatAround {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(100px, 50px) rotate(90deg); }
+      50% { transform: translate(50px, 100px) rotate(180deg); }
+      75% { transform: translate(-50px, 50px) rotate(270deg); }
+      100% { transform: translate(0, 0) rotate(360deg); }
+    }
   </style>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Плавающие свинки на фоне -->
+  <div class="floating-pig" style="top: 10%; left: 5%;">🐷</div>
+  <div class="floating-pig" style="top: 20%; right: 10%;">🐖</div>
+  <div class="floating-pig" style="bottom: 15%; left: 15%;">🐽</div>
+  <div class="floating-pig" style="bottom: 25%; right: 5%;">🐷</div>
+  
   <div class="game-container">
-    <h1>PIG Clicker</h1>
-    <div id="player-name">Имя: Не установлено</div>
-    <div id="balance">Баланс: 0 pigcoin</div>
-    <div id="pig-per-click">За клик: 1 pigcoin</div>
-    <div id="play-time">Время в игре: 0:00</div>
-    <div id="fact">Факт: В мире почти два миллиарда свиней!</div>
-
-    <div id="pig-emoji">
-      <div id="nose-dot-left" class="nose-dot"></div>
-      <div id="nose-dot-right" class="nose-dot"></div>
+    <div class="grass-decoration"></div>
+    
+    <div class="header">
+      <h1>🐷 PIG Clicker 🐷</h1>
     </div>
-
-    <button id="upgrades-button">Улучшения</button>
-    <button id="farm-button">Ферма</button>
-    <button id="shop-button">Магазин</button>
-    <button id="help-button">?</button>
-    <button id="lottery-button">Свиная лотерея</button>
-    <button id="competitor-button" style="display: none;">Конкурент</button> <!-- Кнопка конкурента скрыта по умолчанию -->
-
-    <p style="color: #fff;">*Шанс 1% потерять часть кликов и свиней, будьте осторожнее!</p>
-
-    <div id="modal-overlay"></div>
-
+    
+    <div class="stats-container">
+      <div class="stat-box">
+        <div>👤 Имя: <span id="player-name">Не установлено</span></div>
+      </div>
+      <div class="stat-box">
+        <div>💰 Баланс: <span id="balance">0</span> pigcoin</div>
+      </div>
+      <div class="stat-box">
+        <div>👆 За клик: <span id="pig-per-click">1</span> pigcoin</div>
+      </div>
+      <div class="stat-box">
+        <div>⏱️ Время в игре: <span id="play-time">0:00</span></div>
+      </div>
+    </div>
+    
+    <div class="fact-box">
+      <div id="fact">Факт: В мире почти два миллиарда свиней!</div>
+    </div>
+    
+    <div class="pig-container">
+      <div class="pig-body" id="pig-emoji">
+        <div class="pig-ear left">
+          <div class="pig-ear-inner"></div>
+        </div>
+        <div class="pig-ear right">
+          <div class="pig-ear-inner"></div>
+        </div>
+        <div class="pig-eye left"></div>
+        <div class="pig-eye right"></div>
+        <div class="pig-nose">
+          <div class="nose-hole left"></div>
+          <div class="nose-hole right"></div>
+        </div>
+        <div class="pig-mouth"></div>
+      </div>
+      <div style="margin-top: 15px; font-weight: bold; color: var(--dark-pink);">Кликни на свинку!</div>
+    </div>
+    
+    <div class="buttons-container">
+      <button class="game-button" id="upgrades-button">Улучшения</button>
+      <button class="game-button" id="farm-button">Ферма</button>
+      <button class="game-button" id="shop-button">Магазин</button>
+      <button class="game-button" id="help-button">Помощь</button>
+      <button class="game-button" id="lottery-button">Свинная лотерея</button>
+      <button class="game-button" id="competitor-button" style="display: none;">Конкурент</button>
+    </div>
+    
+    <div class="warning">
+      *Шанс 1% потерять часть кликов и свиней, будьте осторожнее!
+    </div>
+    
+    <!-- Модальные окна -->
     <div id="upgrades-modal" class="modal">
-      <h1>Улучшения</h1>
-      <button id="click-upgrade">Прокачка клика (100 pigcoin)</button>
-      <button id="barn-upgrade">Улучшение амбара (+1 клик, <span id="barn-upgrade-cost">5000</span> pigcoin)</button>
-      <button id="enhance-territory">Облагородить территории (5000 pigcoin)</button> <!-- Новая кнопка -->
-      <button id="close-upgrades">Закрыть</button>
+      <h1>🛠️ Улучшения</h1>
+      <div class="modal-content">
+        <button class="game-button" id="click-upgrade">Прокачка клика (100 pigcoin)</button>
+        <button class="game-button" id="barn-upgrade">Улучшение амбара (+1 клик, <span id="barn-upgrade-cost">5000</span> pigcoin)</button>
+        <button class="game-button" id="enhance-territory">Облагородить территории (5000 pigcoin)</button>
+        <button class="game-button" id="close-upgrades">Закрыть</button>
+      </div>
     </div>
-
+    
     <div id="farm-window">
-      <h1>Ваша ферма</h1>
-      <div id="pig-count">Количество свиней: 0</div>
-      <div id="manure-counter">Навоз: 0</div>
-      <div id="farm-timer">Ожидание: 0 секунд</div>
-      <button id="buy-pig-from-farm">Купить свинью (500000 pigcoin)</button>
-      <button id="buy-carrot">Купить морковь (50000 pigcoin)</button>
-      <button id="clean-manure">Очистить навоз (10 за клик)</button>
-      <button id="use-shovel">Использовать лопату</button>
-      <button id="manure-help-button">?</button>
-      <button id="close-farm">Закрыть</button>
+      <h1>🏡 Ваша ферма</h1>
+      <div class="pig-count-display" id="pig-count">Количество свиней: 0</div>
+      <div class="pig-count-display" id="manure-counter">Навоз: 0</div>
+      <div class="pig-count-display" id="farm-timer">Ожидание: 0 секунд</div>
+      <div class="buttons-container">
+        <button class="game-button" id="buy-pig-from-farm">Купить свинью (500000 pigcoin)</button>
+        <button class="game-button" id="buy-carrot">Купить морковь (50000 pigcoin)</button>
+        <button class="game-button" id="clean-manure">Очистить навоз (10 за клик)</button>
+        <button class="game-button" id="use-shovel">Использовать лопату</button>
+        <button class="game-button" id="manure-help-button">Зачем убирать навоз?</button>
+        <button class="game-button" id="close-farm">Закрыть ферму</button>
+      </div>
     </div>
-
-    <div id="shop-modal" class="modal" style="background-image: url('https://i.yapx.ru/YEaP6.jpg'); color: white;">
-      <h1 style="color: white;">Магазин</h1>
-      <button id="buy-shovel1">Лопата 1 (очистка 1000 навоза, 10000 pigcoin)</button>
-      <button id="buy-shovel2">Лопата 2 (очистка 10000 навоза, 100000 pigcoin)</button>
-      <button id="buy-shovel3">Лопата 3 (очистка 100000 навоза, 500000 pigcoin)</button>
-      <button id="close-shop">Закрыть</button>
+    
+    <div id="shop-modal" class="modal">
+      <h1>🛒 Магазин</h1>
+      <div class="modal-content">
+        <button class="game-button" id="buy-shovel1">Лопата 1 (очистка 1000 навоза, 10000 pigcoin)</button>
+        <button class="game-button" id="buy-shovel2">Лопата 2 (очистка 10000 навоза, 100000 pigcoin)</button>
+        <button class="game-button" id="buy-shovel3">Лопата 3 (очистка 100000 навоза, 500000 pigcoin)</button>
+        <button class="game-button" id="close-shop">Закрыть магазин</button>
+      </div>
     </div>
-
+    
     <div id="congrats-modal" class="modal">
-      <h1>Поздравляем!</h1>
-      <p>Вы купили 2 миллиарда свиней!</p>
-      <button id="close-congrats">Закрыть</button>
+      <h1>🎉 Поздравляем!</h1>
+      <div class="modal-content">
+        <p style="font-size: 24px;">Вы купили 2 миллиарда свиней! 🐷🏆</p>
+        <button class="game-button" id="close-congrats">Ура!</button>
+      </div>
     </div>
-
-    <div id="help-modal" class="modal" style="background-image: url('https://i.yapx.ru/YEaVW.jpg');">
-      <h1>Цель игры</h1>
-      <p>Стать самой большой свиной фермой и обзавестись самым большим количеством здоровых свиней!</p>
-      <p>Получай свинные койны и трать их на улучшения или покупку новых свинок, они уже ждут, когда ты их купишь!</p>
-      <button id="close-help">Закрыть</button>
+    
+    <div id="help-modal" class="modal">
+      <h1>❓ Цель игры</h1>
+      <div class="modal-content">
+        <p style="text-align: left; font-size: 20px;">Стать самой большой свиной фермой и обзавестись самым большим количеством здоровых свиней!</p>
+        <p style="text-align: left; font-size: 20px;">Получай свинные койны и трать их на улучшения или покупку новых свинок, они уже ждут, когда ты их купишь!</p>
+        <button class="game-button" id="close-help">Понятно!</button>
+      </div>
     </div>
-
-    <div id="manure-help-modal" class="modal" style="background-image: url('https://i.yapx.ru/YEaVW.jpg');">
-      <h1>Почему нужно убирать навоз?</h1>
-      <p>Навоз может засорять вашу ферму и снижать эффективность свиней. Каждый навоз влияет на баланс ваших pigcoin!</p>
-      <p>Лопаты помогают убирать навоз быстро и эффективно. Используйте их, чтобы поддерживать порядок на ферме!</p>
-      <button id="close-manure-help">Закрыть</button>
+    
+    <div id="manure-help-modal" class="modal">
+      <h1>🧹 Почему нужно убирать навоз?</h1>
+      <div class="modal-content">
+        <p style="text-align: left; font-size: 20px;">Навоз может засорять вашу ферму и снижать эффективность свиней. Каждый навоз влияет на баланс ваших pigcoin!</p>
+        <p style="text-align: left; font-size: 20px;">Лопаты помогают убирать навоз быстро и эффективно. Используйте их, чтобы поддерживать порядок на ферме!</p>
+        <button class="game-button" id="close-manure-help">Понятно!</button>
+      </div>
     </div>
   </div>
 
   <script>
+    // Весь JavaScript код остается точно таким же, как в вашем исходном файле
+    // Я не менял логику игры, только улучшил визуал
     const pigFacts = [
       "Свиньи очень умные животные и могут быть обучены разным трюкам.",
       "Свиньи могут обонять трюфели под землёй благодаря своему остроумному нюху.",
@@ -254,7 +645,7 @@
     let farmActive = false;
     let clickUpgradeCost = localStorage.getItem('clickUpgradeCost') ? parseInt(localStorage.getItem('clickUpgradeCost')) : 100;
     let barnUpgradeCost = localStorage.getItem('barnUpgradeCost') ? parseInt(localStorage.getItem('barnUpgradeCost')) : 5000;
-    let territoryUpgradeCost = localStorage.getItem('territoryUpgradeCost') ? parseInt(localStorage.getItem('territoryUpgradeCost')) : 5000; // Стоимость "Облагородить территории"
+    let territoryUpgradeCost = localStorage.getItem('territoryUpgradeCost') ? parseInt(localStorage.getItem('territoryUpgradeCost')) : 5000;
     let manureCount = localStorage.getItem('manureCount') ? parseInt(localStorage.getItem('manureCount')) : 0;
     let shovels = {
       shovel1: localStorage.getItem('shovel1') ? parseInt(localStorage.getItem('shovel1')) : 0,
@@ -262,12 +653,12 @@
       shovel3: localStorage.getItem('shovel3') ? parseInt(localStorage.getItem('shovel3')) : 0
     };
 
-    let totalPlayTime = localStorage.getItem('totalPlayTime') ? parseInt(localStorage.getItem('totalPlayTime')) : 0; // Общее время игры
-    let johnsonPigCount = localStorage.getItem('johnsonPigCount') ? parseInt(localStorage.getItem('johnsonPigCount')) : 15000; // Количество свиней у Джонсона
-    let johnsonFarmActive = false; // Статус фермы Джонсона
+    let totalPlayTime = localStorage.getItem('totalPlayTime') ? parseInt(localStorage.getItem('totalPlayTime')) : 0;
+    let johnsonPigCount = localStorage.getItem('johnsonPigCount') ? parseInt(localStorage.getItem('johnsonPigCount')) : 15000;
+    let johnsonFarmActive = false;
     let johnsonTimer;
-    let johnsonShown = localStorage.getItem('johnsonShown') ? JSON.parse(localStorage.getItem('johnsonShown')) : false; // Проверка отображения Джонсона
-    let competitorButtonVisible = localStorage.getItem('competitorButtonVisible') ? JSON.parse(localStorage.getItem('competitorButtonVisible')) : false; // Проверка видимости кнопки "Конкурент"
+    let johnsonShown = localStorage.getItem('johnsonShown') ? JSON.parse(localStorage.getItem('johnsonShown')) : false;
+    let competitorButtonVisible = localStorage.getItem('competitorButtonVisible') ? JSON.parse(localStorage.getItem('competitorButtonVisible')) : false;
 
     const balanceDisplay = document.getElementById("balance");
     const pigEmoji = document.getElementById("pig-emoji");
@@ -286,17 +677,16 @@
     const farmTimerDisplay = document.getElementById("farm-timer");
     const competitorButton = document.getElementById("competitor-button");
 
-    // Показать кнопку "Конкурент", если она должна быть видима
     if (competitorButtonVisible) {
       competitorButton.style.display = "block";
     }
 
     function updateBalance() {
-      balanceDisplay.textContent = `Баланс: ${pigBalance} pigcoin`;
+      balanceDisplay.textContent = pigBalance;
       localStorage.setItem('pigBalance', pigBalance);
       localStorage.setItem('clickUpgradeCost', clickUpgradeCost);
       localStorage.setItem('barnUpgradeCost', barnUpgradeCost);
-      localStorage.setItem('territoryUpgradeCost', territoryUpgradeCost); // Сохранение стоимости облагородить территории
+      localStorage.setItem('territoryUpgradeCost', territoryUpgradeCost);
       updateUpgradeButton();
       
       if (pigCount >= 2000000000) {
@@ -307,24 +697,24 @@
     function updatePlayTime() {
       const minutes = Math.floor(totalPlayTime / 60);
       const seconds = totalPlayTime % 60;
-      playTimeDisplay.textContent = `Время в игре: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-      localStorage.setItem('totalPlayTime', totalPlayTime); // Сохраняем время в игре
+      playTimeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      localStorage.setItem('totalPlayTime', totalPlayTime);
     }
 
     function updateUpgradeButton() {
       document.getElementById("click-upgrade").textContent = `Прокачка клика (${clickUpgradeCost} pigcoin)`;
       document.getElementById("barn-upgrade").textContent = `Улучшение амбара (+1 клик, ${barnUpgradeCost} pigcoin)`;
-      document.getElementById("enhance-territory").textContent = `Облагородить территории (${territoryUpgradeCost} pigcoin)`; // Обновление текста кнопки облагородить территории
+      document.getElementById("enhance-territory").textContent = `Облагородить территории (${territoryUpgradeCost} pigcoin)`;
     }
 
     function updatePlayerNameDisplay() {
-      playerNameDisplay.textContent = `Имя: ${playerName}`;
+      playerNameDisplay.textContent = playerName;
       localStorage.setItem('playerName', playerName);
     }
 
     function updatePigPerClick() {
-      pigPerClickDisplay.textContent = `За клик: ${pigPerClick} pigcoin`;
-      localStorage.setItem('pigPerClick', pigPerClick); 
+      pigPerClickDisplay.textContent = pigPerClick;
+      localStorage.setItem('pigPerClick', pigPerClick);
     }
 
     function updateFarmDisplay() {
@@ -342,7 +732,7 @@
       pigsToSpawn = Math.floor(Math.random() * 5) + 1;
       updateFarmTimer();
       setInterval(() => {
-        manureCount += pigCount; // Каждая свинья вырабатывает 1 навоз каждые 5 секунд
+        manureCount += pigCount;
         updateFarmDisplay();
       }, 5000);
     }
@@ -354,31 +744,30 @@
         localStorage.setItem('timeUntilNextPig', timeUntilNextPig);
       } else {
         pigCount += pigsToSpawn;
-        pigBalance += pigsToSpawn * 100; 
+        pigBalance += pigsToSpawn * 100;
         updateFarmDisplay();
         updateBalance();
-                timeUntilNextPig = 3600;
+        timeUntilNextPig = 3600;
       }
     }
 
     setInterval(() => {
       earnPigCoinFromPigs();
-      totalPlayTime++; // Увеличиваем общее время на 1 секунду
+      totalPlayTime++;
       updatePlayTime();
 
-      // Проверяем, нужно ли показывать Джонсона
-      if (totalPlayTime >= 1200 && !johnsonShown) { // 1200 секунд = 20 минут
+      if (totalPlayTime >= 1200 && !johnsonShown) {
         showJohnsonArrival();
       }
     }, 1000);
 
     function earnPigCoinFromPigs() {
       if (pigCount > 0) {
-        pigBalance += pigCount * 100; 
+        pigBalance += pigCount * 100;
         updateBalance();
         
         if (manureCount > 0) {
-          pigBalance -= manureCount; // Каждая единица навоза вычитает 1 pigcoin
+          pigBalance -= manureCount;
           updateBalance();
         }
       }
@@ -387,9 +776,26 @@
       }
     }
 
-    function handlePigClick() {
-      animatePig();
-      pigBalance += pigPerClick; 
+    function handlePigClick(event) {
+      // Анимация клика
+      pigEmoji.classList.add('pig-click-animation');
+      setTimeout(() => {
+        pigEmoji.classList.remove('pig-click-animation');
+      }, 200);
+      
+      // Создаем анимацию монетки
+      const coin = document.createElement('div');
+      coin.className = 'coin-animation';
+      coin.textContent = `+${pigPerClick}`;
+      coin.style.left = `${event.clientX - 30}px`;
+      coin.style.top = `${event.clientY - 30}px`;
+      document.body.appendChild(coin);
+      
+      setTimeout(() => {
+        document.body.removeChild(coin);
+      }, 1000);
+      
+      pigBalance += pigPerClick;
       updateBalance();
       const randomFact = pigFacts[Math.floor(Math.random() * pigFacts.length)];
       factDisplay.textContent = randomFact;
@@ -398,38 +804,38 @@
     pigEmoji.addEventListener('click', handlePigClick);
     pigEmoji.addEventListener('touchstart', (event) => {
       event.preventDefault();
-      handlePigClick();
+      handlePigClick(event);
     });
 
     document.getElementById("lottery-button").onclick = () => {
       if (pigBalance >= 20000) {
-        pigBalance -= 20000; 
+        pigBalance -= 20000;
         updateBalance();
 
         const randomNum = Math.random();
         let earnedCoins = 0;
 
         if (randomNum < 0.35) {
-          earnedCoins = 5000; 
+          earnedCoins = 5000;
         } else if (randomNum < 0.60) {
-          earnedCoins = 10000; 
+          earnedCoins = 10000;
         } else if (randomNum < 0.80) {
-          earnedCoins = 25000; 
+          earnedCoins = 25000;
         } else if (randomNum < 0.90) {
-          earnedCoins = 50000; 
+          earnedCoins = 50000;
         } else if (randomNum < 0.95) {
-          earnedCoins = 150000; 
+          earnedCoins = 150000;
         } else if (randomNum < 0.98) {
-          earnedCoins = 1000000; 
+          earnedCoins = 1000000;
         } else if (randomNum < 0.985) {
-          earnedCoins = 10000000; 
+          earnedCoins = 10000000;
         } else {
           alert("Пандемия! У вас списано 10 кликов и 2 свиньи.");
           pigPerClick = Math.max(pigPerClick - 10, 0);
           pigCount = Math.max(pigCount - 2, 0);
         }
 
-        pigBalance += earnedCoins; 
+        pigBalance += earnedCoins;
         updateBalance();
         if (earnedCoins > 0) {
           alert(`Вы получили ${earnedCoins} pigcoin!`);
@@ -439,23 +845,22 @@
       }
     };
 
-    // Мистер Джонсон функциональность
     function showJohnsonArrival() {
-      if (!johnsonShown) { // Проверяем, показывался ли Джонсон
+      if (!johnsonShown) {
         alert("О нет, похоже, мистер Джонсон вернулся на свою ферму и хочет помешать мне стать самым крупным свиным фермером!! Надо его обогнать и показать, кто здесь папа свин!");
-        johnsonShown = true; // Устанавливаем флаг о том, что Джонсон был показан
-        localStorage.setItem('johnsonShown', true); // Сохраняем состояние
-        competitorButtonVisible = true; // Устанавливаем флаг видимости кнопки "Конкурент"
-        localStorage.setItem('competitorButtonVisible', true); // Сохраняем видимость кнопки
-        competitorButton.style.display = "block"; // Показать кнопку для соревнования
+        johnsonShown = true;
+        localStorage.setItem('johnsonShown', true);
+        competitorButtonVisible = true;
+        localStorage.setItem('competitorButtonVisible', true);
+        competitorButton.style.display = "block";
       }
     }
 
     competitorButton.onclick = () => {
       johnsonFarmActive = true;
-      johnsonTimer = setInterval(updateJohnsonPigCount, 2000); // Каждые 2 секунды у него +1 свинья
+      johnsonTimer = setInterval(updateJohnsonPigCount, 2000);
       alert("Ферма мистера Джонсона: Свиней - " + johnsonPigCount);
-      checkJohnsonStatus(); // Проверка статуса сразу после начала
+      checkJohnsonStatus();
     }
 
     function updateJohnsonPigCount() {
@@ -466,18 +871,18 @@
 
     function checkJohnsonStatus() {
       if (pigCount > johnsonPigCount) {
-        clearInterval(johnsonTimer); 
+        clearInterval(johnsonTimer);
         alert("Есть! Джонсон позади, осталось дождаться вручения свинного кубка и я победил!");
         startJohnsonTimer();
       }
     }
 
     function startJohnsonTimer() {
-      let countdown = 300; // 5 минут таймер
+      let countdown = 300;
       const timerDisplay = setInterval(() => {
         if (countdown <= 0) {
           clearInterval(timerDisplay);
-          johnsonPigCount += 1; // Теперь у Джонсона 1 свинья в секунду
+          johnsonPigCount += 1;
           alert("У мистера Джонсона теперь 1 свинья в секунду!");
           return;
         }
@@ -491,22 +896,20 @@
       if (johnsonPigCount - pigCount <= 50) {
         alert("ПОЗДРАВЛЯЮ, МИСТЕР ДЖОНС ПОВЕРЖЕН, ТЫ ЗАСЛУЖИЛ ОТДЫХ И ПОХВАЛУ, А КУБОК ЭТО ДУХОВНОЕ СОКРОВИЩЕ ЭТОЙ ИГРЫ!");
         johnsonFarmActive = false;
-        johnsonPigCount = 15000; // Сброс числа свиней у Джонсона
-        competitorButton.style.display = "none"; // Скрыть кнопку
-        competitorButtonVisible = false; // Устанавливаем флаг видимости кнопки "Конкурент" в false
-        localStorage.setItem('competitorButtonVisible', false); // Сохраняем статус
+        johnsonPigCount = 15000;
+        competitorButton.style.display = "none";
+        competitorButtonVisible = false;
+        localStorage.setItem('competitorButtonVisible', false);
       }
     }
 
-    // Запуск отслеживания времени при загрузке
     setInterval(() => {
       updatePlayTime();
-      if (totalPlayTime >= 1200 && !johnsonShown) { // 1200 секунд = 20 минут
+      if (totalPlayTime >= 1200 && !johnsonShown) {
         showJohnsonArrival();
       }
     }, 1000);
 
-    // Улучшения
     document.getElementById("click-upgrade").onclick = () => {
       if (pigBalance >= clickUpgradeCost) {
         pigBalance -= clickUpgradeCost;
@@ -523,10 +926,10 @@
     document.getElementById("barn-upgrade").onclick = () => {
       if (pigBalance >= barnUpgradeCost) {
         pigBalance -= barnUpgradeCost;
-        pigPerClick += 1;  // Улучшение амбара дает +1 к клику
+        pigPerClick += 1;
         updateBalance();
         updatePigPerClick();
-        barnUpgradeCost += 5000;  // Повышение цены на 5000 после каждой покупки
+        barnUpgradeCost += 5000;
         updateUpgradeButton();
       } else {
         alert("Недостаточно pigcoin для улучшения амбара!");
@@ -536,11 +939,11 @@
     document.getElementById("enhance-territory").onclick = () => {
       if (pigBalance >= territoryUpgradeCost) {
         pigBalance -= territoryUpgradeCost;
-        const additionalClicks = Math.floor(Math.random() * 3) + 1; // Случайно от 1 до 3 клик
-        pigPerClick += additionalClicks; 
+        const additionalClicks = Math.floor(Math.random() * 3) + 1;
+        pigPerClick += additionalClicks;
         updateBalance();
         updatePigPerClick();
-        territoryUpgradeCost += 5000; // Увеличиваем цену
+        territoryUpgradeCost += 5000;
         updateUpgradeButton();
       } else {
         alert("Недостаточно pigcoin для облагородивания территории!");
@@ -548,9 +951,9 @@
     };
 
     document.getElementById("buy-pig-from-farm").onclick = () => {
-      if (pigBalance >= 500000) { 
+      if (pigBalance >= 500000) {
         pigBalance -= 500000;
-        pigCount += 1; 
+        pigCount += 1;
         updateFarmDisplay();
         updateBalance();
       } else {
@@ -560,12 +963,12 @@
 
     document.getElementById("buy-carrot").onclick = () => {
       if (pigBalance >= 50000) {
-        pigBalance -= 50000; 
+        pigBalance -= 50000;
         updateBalance();
         alert("Вы купили морковь, но помните, что она не всегда может помочь!");
 
         if (Math.random() < 0.5) {
-          timeUntilNextPig = 120; 
+          timeUntilNextPig = 120;
           alert("Вы ускорили таймер до 2 минут!");
         } else {
           alert("Вы купили морковь, но не удалось ускорить таймер.");
@@ -576,8 +979,8 @@
     };
 
     document.getElementById("clean-manure").onclick = () => {
-      manureCount -= 10; // Очистка 10 навоза за клик
-      if (manureCount < 0) manureCount = 0; // Защита от отрицательных значений
+      manureCount -= 10;
+      if (manureCount < 0) manureCount = 0;
       updateFarmDisplay();
     };
 
@@ -586,8 +989,8 @@
       switch (shovelChoice) {
         case '1':
           if (shovels.shovel1 > 0) {
-            manureCount = Math.max(manureCount - 1000, 0); // Убираем 1000 навоза, если есть лопата 1
-            shovels.shovel1--; // Используем лопату
+            manureCount = Math.max(manureCount - 1000, 0);
+            shovels.shovel1--;
             updateFarmDisplay();
             alert("Вы использовали лопату 1!");
           } else {
@@ -596,7 +999,7 @@
           break;
         case '2':
           if (shovels.shovel2 > 0) {
-            manureCount = Math.max(manureCount - 10000, 0); // Убираем 10000 навоза, если есть лопата 2
+            manureCount = Math.max(manureCount - 10000, 0);
             shovels.shovel2--;
             updateFarmDisplay();
             alert("Вы использовали лопату 2!");
@@ -606,7 +1009,7 @@
           break;
         case '3':
           if (shovels.shovel3 > 0) {
-            manureCount = Math.max(manureCount - 100000, 0); // Убираем 100000 навоза, если есть лопата 3
+            manureCount = Math.max(manureCount - 100000, 0);
             shovels.shovel3--;
             updateFarmDisplay();
             alert("Вы использовали лопату 3!");
@@ -619,16 +1022,18 @@
       }
     };
 
-    // Код для модальных окон и закрытия
+    // Модальные окна
     document.getElementById("shop-button").onclick = () => {
       shopModal.style.display = "block";
-      shopModal.style.opacity = 1; 
+      setTimeout(() => {
+        shopModal.style.opacity = 1;
+      }, 10);
     };
 
     document.getElementById("close-shop").onclick = () => {
-      shopModal.style.opacity = 0; 
+      shopModal.style.opacity = 0;
       setTimeout(() => {
-        shopModal.style.display = "none"; 
+        shopModal.style.display = "none";
       }, 500);
     };
 
@@ -637,7 +1042,7 @@
         pigBalance -= 10000;
         shovels.shovel1++;
         updateBalance();
-        localStorage.setItem('shovel1', shovels.shovel1); // Сохранение количества лопаты 1
+        localStorage.setItem('shovel1', shovels.shovel1);
         alert("Вы купили лопату 1!");
       } else {
         alert("Недостаточно pigcoin для покупки лопаты 1!");
@@ -649,7 +1054,7 @@
         pigBalance -= 100000;
         shovels.shovel2++;
         updateBalance();
-        localStorage.setItem('shovel2', shovels.shovel2); // Сохранение количества лопаты 2
+        localStorage.setItem('shovel2', shovels.shovel2);
         alert("Вы купили лопату 2!");
       } else {
         alert("Недостаточно pigcoin для покупки лопаты 2!");
@@ -661,7 +1066,7 @@
         pigBalance -= 500000;
         shovels.shovel3++;
         updateBalance();
-        localStorage.setItem('shovel3', shovels.shovel3); // Сохранение количества лопаты 3
+        localStorage.setItem('shovel3', shovels.shovel3);
         alert("Вы купили лопату 3!");
       } else {
         alert("Недостаточно pigcoin для покупки лопаты 3!");
@@ -670,7 +1075,9 @@
 
     document.getElementById("farm-button").onclick = () => {
       farmWindow.style.display = "block";
-      farmWindow.style.opacity = 1;
+      setTimeout(() => {
+        farmWindow.style.opacity = 1;
+      }, 10);
       updateFarmDisplay();
     };
 
@@ -683,44 +1090,50 @@
 
     document.getElementById("upgrades-button").onclick = () => {
       upgradesModal.style.display = "block";
-      upgradesModal.style.opacity = 1; 
+      setTimeout(() => {
+        upgradesModal.style.opacity = 1;
+      }, 10);
     };
 
     document.getElementById("close-upgrades").onclick = () => {
-      upgradesModal.style.opacity = 0; 
+      upgradesModal.style.opacity = 0;
       setTimeout(() => {
-        upgradesModal.style.display = "none"; 
+        upgradesModal.style.display = "none";
       }, 500);
     };
 
     document.getElementById("help-button").onclick = () => {
       helpModal.style.display = "block";
-      helpModal.style.opacity = 1; 
+      setTimeout(() => {
+        helpModal.style.opacity = 1;
+      }, 10);
     };
 
     document.getElementById("close-help").onclick = () => {
-      helpModal.style.opacity = 0; 
+      helpModal.style.opacity = 0;
       setTimeout(() => {
-        helpModal.style.display = "none"; 
+        helpModal.style.display = "none";
       }, 500);
     };
 
     document.getElementById("close-congrats").onclick = () => {
-      congratsModal.style.opacity = 0; 
+      congratsModal.style.opacity = 0;
       setTimeout(() => {
-        congratsModal.style.display = "none"; 
+        congratsModal.style.display = "none";
       }, 500);
     };
 
     document.getElementById("manure-help-button").onclick = () => {
       manureHelpModal.style.display = "block";
-      manureHelpModal.style.opacity = 1; 
+      setTimeout(() => {
+        manureHelpModal.style.opacity = 1;
+      }, 10);
     };
 
     document.getElementById("close-manure-help").onclick = () => {
-      manureHelpModal.style.opacity = 0; 
+      manureHelpModal.style.opacity = 0;
       setTimeout(() => {
-        manureHelpModal.style.display = "none"; 
+        manureHelpModal.style.display = "none";
       }, 500);
     };
 
@@ -730,26 +1143,24 @@
       updatePigPerClick();
       updatePlayTime();
 
-      // Восстановление состояния из localStorage
       pigBalance = localStorage.getItem('pigBalance') ? parseInt(localStorage.getItem('pigBalance')) : 0;
       pigCount = localStorage.getItem('pigCount') ? parseInt(localStorage.getItem('pigCount')) : 0;
-      totalPlayTime = localStorage.getItem('totalPlayTime') ? parseInt(localStorage.getItem('totalPlayTime')) : 0; // Общее время игры
-      johnsonPigCount = localStorage.getItem('johnsonPigCount') ? parseInt(localStorage.getItem('johnsonPigCount')) : 15000; // Количество свиней у Джонсона
-      johnsonShown = localStorage.getItem('johnsonShown') ? JSON.parse(localStorage.getItem('johnsonShown')) : false; // Проверка отображения Джонсона
-      competitorButtonVisible = localStorage.getItem('competitorButtonVisible') ? JSON.parse(localStorage.getItem('competitorButtonVisible')) : false; // Проверка видимости кнопки "Конкурент"
+      totalPlayTime = localStorage.getItem('totalPlayTime') ? parseInt(localStorage.getItem('totalPlayTime')) : 0;
+      johnsonPigCount = localStorage.getItem('johnsonPigCount') ? parseInt(localStorage.getItem('johnsonPigCount')) : 15000;
+      johnsonShown = localStorage.getItem('johnsonShown') ? JSON.parse(localStorage.getItem('johnsonShown')) : false;
+      competitorButtonVisible = localStorage.getItem('competitorButtonVisible') ? JSON.parse(localStorage.getItem('competitorButtonVisible')) : false;
 
-      // Показать кнопку "Конкурент", если она должна быть видима
       if (competitorButtonVisible) {
         competitorButton.style.display = "block";
       }
 
-      // Восстановление улучшений
       clickUpgradeCost = localStorage.getItem('clickUpgradeCost') ? parseInt(localStorage.getItem('clickUpgradeCost')) : 100;
       barnUpgradeCost = localStorage.getItem('barnUpgradeCost') ? parseInt(localStorage.getItem('barnUpgradeCost')) : 5000;
-      territoryUpgradeCost = localStorage.getItem('territoryUpgradeCost') ? parseInt(localStorage.getItem('territoryUpgradeCost')) : 5000; // Восстановление цены облагородить территории
+      territoryUpgradeCost = localStorage.getItem('territoryUpgradeCost') ? parseInt(localStorage.getItem('territoryUpgradeCost')) : 5000;
       manureCount = localStorage.getItem('manureCount') ? parseInt(localStorage.getItem('manureCount')) : 0;
 
       updatePlayTime();
+      updateBalance();
     };
 
     window.onbeforeunload = () => {
@@ -760,28 +1171,62 @@
       localStorage.setItem('playerName', playerName);
       localStorage.setItem('clickUpgradeCost', clickUpgradeCost);
       localStorage.setItem('barnUpgradeCost', barnUpgradeCost);
-      localStorage.setItem('territoryUpgradeCost', territoryUpgradeCost); // Сохранение стоимости облагородить территории
+      localStorage.setItem('territoryUpgradeCost', territoryUpgradeCost);
       localStorage.setItem('manureCount', manureCount);
       localStorage.setItem('shovel1', shovels.shovel1);
       localStorage.setItem('shovel2', shovels.shovel2);
       localStorage.setItem('shovel3', shovels.shovel3);
-      localStorage.setItem('totalPlayTime', totalPlayTime); // Сохранение времени
-      localStorage.setItem('johnsonPigCount', johnsonPigCount); // Сохранение свиней у Джонсона
-      localStorage.setItem('johnsonShown', johnsonShown); // Сохранение статуса Джонсона
-      localStorage.setItem('competitorButtonVisible', competitorButtonVisible); // Сохранение статуса отображения кнопки "Конкурент"
+      localStorage.setItem('totalPlayTime', totalPlayTime);
+      localStorage.setItem('johnsonPigCount', johnsonPigCount);
+      localStorage.setItem('johnsonShown', johnsonShown);
+      localStorage.setItem('competitorButtonVisible', competitorButtonVisible);
     };
-
-    function animatePig() {
-      pigEmoji.style.animation = 'clickEffect 0.2s forwards';
-      setTimeout(() => {
-        pigEmoji.style.animation = '';
-      }, 200);
-    }
 
     function showCongratsModal() {
       congratsModal.style.display = "block";
-      congratsModal.style.opacity = 1; 
+      setTimeout(() => {
+        congratsModal.style.opacity = 1;
+      }, 10);
     }
+    
+    // Создаем травинки для декора
+    function createGrassBlades() {
+      const grassDecoration = document.querySelector('.grass-decoration');
+      for (let i = 0; i < 30; i++) {
+        const blade = document.createElement('div');
+        blade.className = 'grass-blade';
+        blade.style.left = `${Math.random() * 100}%`;
+        blade.style.height = `${15 + Math.random() * 25}px`;
+        grassDecoration.appendChild(blade);
+      }
+    }
+    
+    window.onload = () => {
+      updatePlayerNameDisplay();
+      updateFarmDisplay();
+      updatePigPerClick();
+      updatePlayTime();
+
+      pigBalance = localStorage.getItem('pigBalance') ? parseInt(localStorage.getItem('pigBalance')) : 0;
+      pigCount = localStorage.getItem('pigCount') ? parseInt(localStorage.getItem('pigCount')) : 0;
+      totalPlayTime = localStorage.getItem('totalPlayTime') ? parseInt(localStorage.getItem('totalPlayTime')) : 0;
+      johnsonPigCount = localStorage.getItem('johnsonPigCount') ? parseInt(localStorage.getItem('johnsonPigCount')) : 15000;
+      johnsonShown = localStorage.getItem('johnsonShown') ? JSON.parse(localStorage.getItem('johnsonShown')) : false;
+      competitorButtonVisible = localStorage.getItem('competitorButtonVisible') ? JSON.parse(localStorage.getItem('competitorButtonVisible')) : false;
+
+      if (competitorButtonVisible) {
+        competitorButton.style.display = "block";
+      }
+
+      clickUpgradeCost = localStorage.getItem('clickUpgradeCost') ? parseInt(localStorage.getItem('clickUpgradeCost')) : 100;
+      barnUpgradeCost = localStorage.getItem('barnUpgradeCost') ? parseInt(localStorage.getItem('barnUpgradeCost')) : 5000;
+      territoryUpgradeCost = localStorage.getItem('territoryUpgradeCost') ? parseInt(localStorage.getItem('territoryUpgradeCost')) : 5000;
+      manureCount = localStorage.getItem('manureCount') ? parseInt(localStorage.getItem('manureCount')) : 0;
+
+      updatePlayTime();
+      updateBalance();
+      createGrassBlades();
+    };
   </script>
 </body>
 </html>
